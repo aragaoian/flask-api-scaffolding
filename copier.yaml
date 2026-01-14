@@ -1,11 +1,55 @@
-answers_file: copier-answers.yml
+_answers_file: .copier-answers.yaml
 
 project_name:
   type: str
-  help: What is your project name?
+  help: Qual o nome do projeto?
+  validator: |
+    {% if project_name|length < 4 or project_name|length > 40 %}
+    project_name must be between 4 and 40 characters
+    {% endif %}
+    {% if not (project_name | regex_search('^[a-z][a-z0-9\-]+$')) %}
+    project_name must start with a letter, followed one or more letters, digits or dashes (all lowercase).
+    {% endif %}
+
+variable_name:
+  type: str
+  help: Qual o nome da variável do projeto?
+  default: "{{ project_name.replace('-', '_') }}"
+  validator: |
+    {% if variable_name|length < 4 or variable_name|length > 40 %}
+    variable_name must be between 4 and 40 characters
+    {% endif %}
+    {% if not (variable_name | regex_search('^[a-z][a-z0-9_]+$')) %}
+    variable_name must start with a letter, followed one or more letters, digits or underscores (all lowercase).
+    {% endif %}
+
+formatted_name:
+  type: str
+  help: Qual o nome formatado (Legível)?
+  default: "{{ project_name.replace('-', ' ') | title }}"
 
 module_name:
   type: str
-  help: What is your python module name?
-  default: "{{ project_name.replace('-', '_') }}"
-  
+  help: Qual o nome do módulo python?
+  default: "{{ formatted_name.replace(' ', '')}}"
+
+mongodb_log_name:
+  type: str
+  help: Qual o id do projeto no MONGODB?
+  default: "{{ formatted_name.replace(' ', '')}}"
+
+python_version:
+  type: str
+  help: Selecione a versão do python
+  default: "3.9.6"
+
+use_precommit:
+  type: bool
+  help: Usar pre-commit? (Y/n)
+  default: true
+
+_tasks:
+  - "cp .env.example .env"          
+  - "py -m uv venv .venv --python 3.9.6"
+  - "py -m uv sync"
+  - "py -m uv run pre-commit install"

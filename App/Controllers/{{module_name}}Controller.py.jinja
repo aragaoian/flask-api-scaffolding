@@ -1,0 +1,7 @@
+from flask import Blueprint
+{{variable_name}}_bp = Blueprint("{{variable_name}}_bp", __name__)
+
+
+@{{variable_name}}_bp.route("/")
+def index():
+    return "Oh, shit, here we go again!"

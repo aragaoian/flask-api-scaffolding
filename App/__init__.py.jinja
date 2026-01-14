@@ -1,0 +1,17 @@
+import os
+import cx_Oracle
+from flask import Flask
+from App.Controllers.{{ module_name }}Controller import {{ variable_name }}_bp
+
+
+def create_app():
+    pathnota = os.getcwd() + "\\App\\Templates"
+    app = Flask("atualizarstatusclientesalesforce", template_folder=pathnota)
+    try:
+        cx_Oracle.init_oracle_client(lib_dir=os.getenv("ORACLE_CLIENT"))
+    except cx_Oracle.Error as e:
+        print(os.getenv("ORACLE_CLIENT"))
+        print("Erro ao iniciar client oracle: " + str(e))
+    with app.app_context():
+        app.register_blueprint({{ variable_name }}_bp)
+        return app
